@@ -17,7 +17,7 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: isDark ? Color(0xFF263238) : Color(0xFF607D8B),
+        backgroundColor: isDark ? Color(0xFF1B5E20) : Color(0xFF2E7D32), // Dark green for both themes
         title: Text('All Tasks', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
@@ -66,24 +66,45 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: Container(
-        color: isDark ? Color(0xFF263238) : Color(0xFF607D8B),
-        padding: EdgeInsets.all(12),
-        child: SizedBox(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 18),
+        child: Container(
           width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.yellow,
-              foregroundColor: Colors.black,
-              textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          height: 70,
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF388E3C) : Color(0xFF43A047), // Appealing green
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 12,
+                offset: Offset(0, -4),
+              )
+            ],
+          ),
+          padding: EdgeInsets.all(10),
+          child: SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow,
+                foregroundColor: Colors.black,
+                textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: isDark ? Color(0xFF388E3C) : Color(0xFF43A047), width: 2),
+                ),
+                elevation: 2,
+              ),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => AddTaskSheet(),
+                );
+              },
+              child: Text('Add Task'),
             ),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) => AddTaskSheet(),
-              );
-            },
-            child: Text('Add Task'),
           ),
         ),
       ),

@@ -45,4 +45,13 @@ class SupabaseService extends ChangeNotifier {
         .execute();
     fetchTasks();
   }
+
+  Future<void> editTask(String id, String newTitle) async {
+    await supabase
+        .from('tasks')
+        .update({'title': newTitle})
+        .eq('id', id)
+        .execute();
+    fetchTasks();
+  }
 }
