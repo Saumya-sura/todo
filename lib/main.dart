@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:todoapp/auth/auth_service.dart';
+import 'package:todoapp/auth/login_screen.dart' show LoginScreen;
+import 'package:todoapp/auth/signup_screen.dart' show SignupScreen;
+import 'package:todoapp/dashboard/dashboard_screen.dart';
+import 'package:todoapp/services/supabase_service.dart';
 import 'app/theme.dart';
-import 'auth/auth_service.dart';
-import 'auth/login_screen.dart';
-import 'auth/signup_screen.dart';
-import 'dashboard/dashboard_screen.dart';
-import 'services/supabase_service.dart';
+
+class ThemeModeProvider extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode get themeMode => _themeMode;
+
+  void toggleTheme() {
+    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+  }
+}
 
 
 void main() async {
@@ -27,13 +37,14 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SupabaseService()),
+        ChangeNotifierProvider(create: (_) => ThemeModeProvider()),
       ],
-      child: Consumer<AuthService>(
-        builder: (context, auth, _) {
+      child: Consumer2<AuthService, ThemeModeProvider>(
+        builder: (context, auth, themeProvider, _) {
           return MaterialApp(
             theme: lightTheme,
             darkTheme: darkTheme,
-            themeMode: ThemeMode.system,
+            themeMode: themeProvider.themeMode,
             initialRoute: auth.isLoggedIn ? '/dashboard' : '/login',
             routes: {
               '/login': (context) => LoginScreen(),

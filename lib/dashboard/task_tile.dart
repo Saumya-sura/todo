@@ -15,11 +15,20 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: 1.0,
-      duration: Duration(milliseconds: 300),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Color(0xFF455A64) : Color(0xFFB0BEC5),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: ListTile(
-        title: Text(task.title),
+        title: Text(
+          task.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -30,13 +39,13 @@ class TaskTile extends StatelessWidget {
                 key: ValueKey(task.completed),
                 icon: Icon(
                   task.completed ? Icons.check_box : Icons.check_box_outline_blank,
-                  color: task.completed ? Colors.green : null,
+                  color: Colors.yellow,
                 ),
                 onPressed: onToggle,
               ),
             ),
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: Icon(Icons.delete, color: Colors.white),
               onPressed: onDelete,
             ),
           ],

@@ -29,6 +29,10 @@ class LoginScreen extends StatelessWidget {
                 onPressed: () async {
                   await Provider.of<AuthService>(context, listen: false)
                       .login(emailController.text, passwordController.text);
+                  final auth = Provider.of<AuthService>(context, listen: false);
+                  if (auth.isLoggedIn) {
+                    Navigator.pushReplacementNamed(context, '/dashboard');
+                  }
                 },
                 child: Text('Login'),
               ),
