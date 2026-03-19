@@ -35,17 +35,31 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       body: Container(
-        color: isDark ? Color(0xFF37474F) : Color(0xFF90A4AE),
+        color: isDark ? Color(0xFF37474F) : Colors.white,
         child: ListView.builder(
           itemCount: tasks.length,
           itemBuilder: (context, index) {
             final task = tasks[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-              child: TaskTile(
-                task: task,
-                onDelete: () => taskService.deleteTask(task.id),
-                onToggle: () => taskService.toggleTask(task.id),
+            return Dismissible(
+              key: ValueKey(task.id),
+              direction: DismissDirection.endToStart,
+              onDismissed: (_) => taskService.deleteTask(task.id),
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.delete, color: Colors.white),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+                child: TaskTile(
+                  task: task,
+                  onDelete: () => taskService.deleteTask(task.id),
+                  onToggle: () => taskService.toggleTask(task.id),
+                ),
               ),
             );
           },
