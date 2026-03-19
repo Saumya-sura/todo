@@ -2,12 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/auth/auth_service.dart';
 import 'package:todoapp/main.dart';
+import 'dart:ui';
 
 import '../services/supabase_service.dart';
 import 'task_tile.dart';
 import 'task_model.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
+  bool _isAnimating = false;
+  late AnimationController _controller;
+  late Animation<double> _opacityAnim;
+  late Animation<double> _blurAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 600));
+    _opacityAnim = Tween<double>(begin: 1, end: 0).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _blurAnim = Tween<double>(begin: 0, end: 8).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateThemeToggle(VoidCallback toggleTheme) async {
+    setState(() => _isAnimating = true);
+    await _controller.forward();
+    toggleTheme();
+    await Future.delayed(Duration(milliseconds: 200));
+    await _controller.reverse();
+    setState(() => _isAnimating = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskService = Provider.of<SupabaseService>(context);
@@ -15,7 +49,7 @@ class DashboardScreen extends StatelessWidget {
     final themeProvider = Provider.of<ThemeModeProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
+    Widget mainContent = Scaffold(
       appBar: AppBar(
         backgroundColor: isDark ? Color(0xFF1B5E20) : Color(0xFF2E7D32), // Dark green for both themes
         title: Text('All Tasks', style: TextStyle(color: Colors.white)),
@@ -23,7 +57,7 @@ class DashboardScreen extends StatelessWidget {
           IconButton(
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: Colors.yellow),
             tooltip: 'Toggle Theme',
-            onPressed: () => themeProvider.toggleTheme(),
+            onPressed: () => _animateThemeToggle(themeProvider.toggleTheme),
           ),
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white),
@@ -108,6 +142,27 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    return Stack(
+      children: [
+        mainContent,
+        if (_isAnimating)
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _opacityAnim.value,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: _blurAnim.value, sigmaY: _blurAnim.value),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.12),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }
